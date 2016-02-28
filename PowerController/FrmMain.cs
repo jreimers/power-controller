@@ -6,7 +6,7 @@ using System.IO.Ports;
 using System.Threading;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
+using OxyPlot.Axes;
 
 namespace PowerController
 {
@@ -104,6 +104,7 @@ namespace PowerController
             Model.Series.Add(InputCurrent);
             Model.Series.Add(OutputVoltage);
             Model.Series.Add(OutputCurrent);
+            Model.Axes.Add(new LinearAxis() { IsAxisVisible = false, Position = AxisPosition.Bottom }); // hide x axis
             this.plotAmplitude.Model = Model;
         }
 
@@ -140,7 +141,7 @@ namespace PowerController
                 return;
             }
 
-            Thread t = new Thread(new ParameterizedThreadStart(
+            Thread t = new Thread(new ParameterizedThreadStart( // spin off serial port thread
                 delegate (object serialPort)
                 {
                     SerialPort sp = (SerialPort)serialPort;
@@ -149,33 +150,33 @@ namespace PowerController
                         try
                         {
                             List<Packet> data = new List<Packet>();
-                            while (sp.BytesToRead > PACKET_LENGTH)
+                            while (sp.BytesToRead > PACKET_LENGTH) // wait for full packet in serial buffer
                             {
                                 int input = sp.ReadByte();
                                 if (input != PACKET_START)
                                 {
-                                    continue;
+                                    continue; // discard packets until the packet header is found to sync up reads
                                 }
 
                                 byte[] packetBytes = new byte[PAYLOAD_BYTES];
-                                sp.Read(packetBytes, 0, PAYLOAD_BYTES);
-
+                                sp.Read(packetBytes, 0, PAYLOAD_BYTES); // read payload bytes
+                                // unpack bytes into struct
                                 GCHandle handle = GCHandle.Alloc(packetBytes, GCHandleType.Pinned);
                                 Packet p = Marshal.PtrToStructure<Packet>(handle.AddrOfPinnedObject());
-                                    
+                                // read packet end
                                 input = sp.ReadByte();
                                 if(input == PACKET_END)
                                 {
-                                    data.Add(p);
+                                    data.Add(p); // successful packet read, add packet to output buffer
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Packet Read Error: {0:X}", input);
+                                    Console.WriteLine("Packet Read Error: {0:X}", input); // didn't get correct packet terminator, skip packet
                                 }
                             }
                             if (data.Count > 0)
                             {
-                                Invoke(new EventHandler(ProcessData), data, EventArgs.Empty);
+                                Invoke(new EventHandler(ProcessData), data, EventArgs.Empty); // send output buffer back to other thread
                             }
                         }
                         catch (Exception)
@@ -192,7 +193,9 @@ namespace PowerController
 
             lblError.Text = "";
         }
-        int x = 0;
+        
+        private int x = 0; // current x axis position
+        // event handler for invoke from serial port thread
         private void ProcessData(object sender, EventArgs e)
         {
             List<Packet> dataPoints = (List<Packet>)sender;
@@ -206,6 +209,7 @@ namespace PowerController
             }
             Model.InvalidatePlot(true);
         }
+        // add to line series and trim old data
         private void addToMovingWindow(LineSeries data, int x, float y)
         {
             if(data.Points.Count > PLOT_BUFFER)
@@ -214,7 +218,10 @@ namespace PowerController
             }
             data.Points.Add(new DataPoint((double)x, (double)y));
         }
-
+        /// <summary>
+        /// Tries to send a control command to the converter after verifying setpoint data
+        /// </summary>
+        /// <returns>If the TX was successful</returns>
         private bool controllerTransmit()
         {
             try
@@ -228,13 +235,14 @@ namespace PowerController
                         value = tb.getFloatValue();
                     }
                 }
+                // write a control packet
                 this.Port.Write(new byte[] { PACKET_START }, 0, 1);
                 this.Port.Write(BitConverter.GetBytes(mode), 0, FLOAT_SIZE);
                 this.Port.Write(BitConverter.GetBytes(value), 0, FLOAT_SIZE);
                 this.Port.Write(new byte[] { PACKET_END }, 0, 1);
                 return true;
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return false;
             }
@@ -246,11 +254,12 @@ namespace PowerController
             this.Running = false;
         }
 
+        // controller mode change event handler
         private void OnControllerModeChange(ControllerMode newMode)
         {
             lblStatus.Text = "Mode: " + newMode.ToString();
             this.Mode = newMode;
-            if(!controllerTransmit())
+            if(!controllerTransmit()) // if error TX, disable buttons TODO: make sure state is determinate
             {
                 foreach (CheckBox cb in modeSelectors)
                 {
@@ -272,11 +281,11 @@ namespace PowerController
             CheckBox btn = (CheckBox)sender;
             ControllerMode newMode = (ControllerMode)btn.Tag;
             gbForward.Focus();
-            if(this.Mode == newMode && btn.Checked == false)
+            if(this.Mode == newMode && btn.Checked == false) // an already checked mode was clicked, turn off converter
             {
                 OnControllerModeChange(ControllerMode.Off);
             }
-            else if (btn.Checked)
+            else if (btn.Checked) // a new state was clicked
             {
                 OnControllerModeChange(newMode);
             }
