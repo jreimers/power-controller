@@ -7,6 +7,8 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using OxyPlot.Axes;
+using System.IO;
+using System.Diagnostics;
 
 namespace PowerController
 {
@@ -40,7 +42,7 @@ namespace PowerController
             public float[] data;
         }
 
-        const int PLOT_BUFFER = 128; // number of data points to plot
+        const int PLOT_BUFFER = 4096; // number of data points to plot
 
         /// <summary>
         /// List of serial port names
@@ -86,10 +88,14 @@ namespace PowerController
             get;
             set;
         }
+        public bool Logging { get; private set; }
+        public StreamWriter LogFile { get; private set; }
+        public Stopwatch LogTimer { get; private set; }
 
         public FrmMain()
         {
             InitializeComponent();
+
 
             this.Mode = ControllerMode.Off;
             modeSelectors = new CheckBox[] { btnFwdCC, btnFwdCV, btnRevCC, btnRevCV };
@@ -199,15 +205,38 @@ namespace PowerController
         private void ProcessData(object sender, EventArgs e)
         {
             List<Packet> dataPoints = (List<Packet>)sender;
-            foreach(Packet p in dataPoints)
+            for(int i = 0; i < dataPoints.Count; i++)
             {
                 x++;
-                addToMovingWindow(InputVoltage, x, p.data[0]);
-                addToMovingWindow(InputCurrent, x, p.data[1]);
-                addToMovingWindow(OutputVoltage, x, p.data[2]);
-                addToMovingWindow(OutputCurrent, x, p.data[3]);
+                addToMovingWindow(InputVoltage, x, dataPoints[i].data[0]);
+                addToMovingWindow(InputCurrent, x, dataPoints[i].data[1]);
+                addToMovingWindow(OutputVoltage, x, dataPoints[i].data[2]);
+                addToMovingWindow(OutputCurrent, x, dataPoints[i].data[3]);
+            }
+            updateNumericDisplays(dataPoints[dataPoints.Count - 1]);
+            if (this.Logging)
+            {
+                writeToLogFile(dataPoints[dataPoints.Count - 1]);
             }
             Model.InvalidatePlot(true);
+        }
+        private void updateNumericDisplays(Packet p)
+        {
+            tbInputVoltage.Text = p.data[0].ToString("0.00V");
+            tbInputCurrent.Text = p.data[1].ToString("0.00A");
+            tbOutputVoltage.Text = p.data[2].ToString("0.00V");
+            tbOutputCurrent.Text = p.data[3].ToString("0.00A");
+        }
+        private void writeToLogFile(Packet p)
+        {
+            this.LogFile.WriteLine("{0},{1},{2:0.000},{3:0.000},{4:0.000},{5:0.000}",
+                this.LogTimer.ElapsedMilliseconds,
+                this.Mode,
+                p.data[0],
+                p.data[1],
+                p.data[2],
+                p.data[3]
+            );
         }
         // add to line series and trim old data
         private void addToMovingWindow(LineSeries data, int x, float y)
@@ -236,10 +265,14 @@ namespace PowerController
                     }
                 }
                 // write a control packet
-                this.Port.Write(new byte[] { PACKET_START }, 0, 1);
-                this.Port.Write(BitConverter.GetBytes(mode), 0, FLOAT_SIZE);
-                this.Port.Write(BitConverter.GetBytes(value), 0, FLOAT_SIZE);
-                this.Port.Write(new byte[] { PACKET_END }, 0, 1);
+                byte[] packet = new byte[2 + FLOAT_SIZE * 2];
+                packet[0] = PACKET_START;
+                Array.Copy(BitConverter.GetBytes(mode), 0, packet, 1, FLOAT_SIZE);
+                Array.Copy(BitConverter.GetBytes(value), 0, packet, 1 + FLOAT_SIZE, FLOAT_SIZE);
+                packet[1 + 2 * FLOAT_SIZE] = PACKET_END;
+                // write it twice for redundancy
+                this.Port.Write(packet, 0, packet.Length);
+                this.Port.Write(packet, 0, packet.Length);
                 return true;
             }
             catch(Exception)
@@ -289,6 +322,29 @@ namespace PowerController
             {
                 OnControllerModeChange(newMode);
             }
+        }
+
+        private void btnLogStart_Click(object sender, EventArgs e)
+        {
+            this.Logging = true;
+            string fileName = "./log-" + DateTime.Now.ToString("dd-MMM-HH-mm-ss") + ".log";
+            this.LogFile = new StreamWriter(fileName);
+            this.lblLogFile.Text = fileName;
+            this.LogTimer = new Stopwatch();
+            this.LogTimer.Start();
+        }
+
+        private void btnLogStop_Click(object sender, EventArgs e)
+        {
+            this.LogTimer.Stop();
+            this.Logging = false;
+            this.LogFile.Flush();
+            this.LogFile.Close();
+        }
+
+        private void lblLogFile_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("notepad.exe", lblLogFile.Text);
         }
     }
 }

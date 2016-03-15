@@ -369,7 +369,14 @@ public class NumericTextBox : TextBox
     /// <returns>float value</returns>
     public float getFloatValue()
     {
-        return float.Parse(this.Text);
+        try
+        {
+            return float.Parse(this.Text);
+        }
+        catch
+        {
+            return 0;
+        }
     }
 
 
