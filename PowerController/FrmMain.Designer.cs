@@ -38,6 +38,8 @@
             this.btnFwdCC = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.tbFwdCurrent = new NumericTextBox();
+            this.tbFwdVoltage = new NumericTextBox();
             this.btnRevCV = new System.Windows.Forms.CheckBox();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
@@ -45,6 +47,8 @@
             this.btnRevCC = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.tbRevCurrent = new NumericTextBox();
+            this.tbRevVoltage = new NumericTextBox();
             this.tbInputVoltage = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
@@ -54,19 +58,15 @@
             this.label9 = new System.Windows.Forms.Label();
             this.tbOutputCurrent = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnLogStart = new System.Windows.Forms.Button();
-            this.btnLogStop = new System.Windows.Forms.Button();
             this.lblLogFile = new System.Windows.Forms.LinkLabel();
-            this.tbRevCurrent = new NumericTextBox();
-            this.tbRevVoltage = new NumericTextBox();
-            this.tbFwdCurrent = new NumericTextBox();
-            this.tbFwdVoltage = new NumericTextBox();
+            this.btnLogStop = new System.Windows.Forms.Button();
+            this.btnLogStart = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.btnOpen = new System.Windows.Forms.Button();
-            this.btnRestart = new System.Windows.Forms.Button();
-            this.btnPlay = new System.Windows.Forms.Button();
-            this.btnPause = new System.Windows.Forms.Button();
             this.lblDriveCycleFile = new System.Windows.Forms.Label();
+            this.btnPause = new System.Windows.Forms.Button();
+            this.btnPlay = new System.Windows.Forms.Button();
+            this.btnRestart = new System.Windows.Forms.Button();
+            this.btnOpen = new System.Windows.Forms.Button();
             this.gbForward.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.gbReverse.SuspendLayout();
@@ -151,7 +151,7 @@
             this.btnFwdCV.Name = "btnFwdCV";
             this.btnFwdCV.Size = new System.Drawing.Size(98, 23);
             this.btnFwdCV.TabIndex = 10;
-            this.btnFwdCV.Tag = PowerController.FrmMain.ControllerMode.ForwardCV;
+            this.btnFwdCV.Tag = PowerController.ConverterMode.ForwardCV;
             this.btnFwdCV.Text = "Constant Voltage";
             this.btnFwdCV.UseVisualStyleBackColor = true;
             this.btnFwdCV.CheckedChanged += new System.EventHandler(this.modeBtn_CheckedChanged);
@@ -164,7 +164,7 @@
             this.btnFwdCC.Name = "btnFwdCC";
             this.btnFwdCC.Size = new System.Drawing.Size(96, 23);
             this.btnFwdCC.TabIndex = 14;
-            this.btnFwdCC.Tag = PowerController.FrmMain.ControllerMode.ForwardCC;
+            this.btnFwdCC.Tag = PowerController.ConverterMode.ForwardCC;
             this.btnFwdCC.Text = "Constant Current";
             this.btnFwdCC.UseVisualStyleBackColor = true;
             this.btnFwdCC.CheckedChanged += new System.EventHandler(this.modeBtn_CheckedChanged);
@@ -189,6 +189,30 @@
             this.label2.TabIndex = 12;
             this.label2.Text = "V";
             // 
+            // tbFwdCurrent
+            // 
+            this.tbFwdCurrent.DecimalNumbers = 2;
+            this.tbFwdCurrent.ForeColor = System.Drawing.Color.Black;
+            this.tbFwdCurrent.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
+            this.tbFwdCurrent.HasNegatives = true;
+            this.tbFwdCurrent.Location = new System.Drawing.Point(6, 47);
+            this.tbFwdCurrent.Name = "tbFwdCurrent";
+            this.tbFwdCurrent.Size = new System.Drawing.Size(61, 20);
+            this.tbFwdCurrent.TabIndex = 9;
+            this.tbFwdCurrent.Tag = PowerController.ConverterMode.ForwardCC;
+            // 
+            // tbFwdVoltage
+            // 
+            this.tbFwdVoltage.DecimalNumbers = 2;
+            this.tbFwdVoltage.ForeColor = System.Drawing.Color.Black;
+            this.tbFwdVoltage.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
+            this.tbFwdVoltage.HasNegatives = true;
+            this.tbFwdVoltage.Location = new System.Drawing.Point(6, 18);
+            this.tbFwdVoltage.Name = "tbFwdVoltage";
+            this.tbFwdVoltage.Size = new System.Drawing.Size(61, 20);
+            this.tbFwdVoltage.TabIndex = 8;
+            this.tbFwdVoltage.Tag = PowerController.ConverterMode.ForwardCV;
+            // 
             // btnRevCV
             // 
             this.btnRevCV.Appearance = System.Windows.Forms.Appearance.Button;
@@ -197,7 +221,7 @@
             this.btnRevCV.Name = "btnRevCV";
             this.btnRevCV.Size = new System.Drawing.Size(98, 23);
             this.btnRevCV.TabIndex = 11;
-            this.btnRevCV.Tag = PowerController.FrmMain.ControllerMode.ReverseCV;
+            this.btnRevCV.Tag = PowerController.ConverterMode.ReverseCV;
             this.btnRevCV.Text = "Constant Voltage";
             this.btnRevCV.UseVisualStyleBackColor = true;
             this.btnRevCV.CheckedChanged += new System.EventHandler(this.modeBtn_CheckedChanged);
@@ -242,7 +266,7 @@
             this.btnRevCC.Name = "btnRevCC";
             this.btnRevCC.Size = new System.Drawing.Size(96, 23);
             this.btnRevCC.TabIndex = 15;
-            this.btnRevCC.Tag = PowerController.FrmMain.ControllerMode.ReverseCC;
+            this.btnRevCC.Tag = PowerController.ConverterMode.ReverseCC;
             this.btnRevCC.Text = "Constant Current";
             this.btnRevCC.UseVisualStyleBackColor = true;
             this.btnRevCC.CheckedChanged += new System.EventHandler(this.modeBtn_CheckedChanged);
@@ -266,6 +290,30 @@
             this.label5.Size = new System.Drawing.Size(15, 13);
             this.label5.TabIndex = 12;
             this.label5.Text = "V";
+            // 
+            // tbRevCurrent
+            // 
+            this.tbRevCurrent.DecimalNumbers = 2;
+            this.tbRevCurrent.ForeColor = System.Drawing.Color.Black;
+            this.tbRevCurrent.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
+            this.tbRevCurrent.HasNegatives = true;
+            this.tbRevCurrent.Location = new System.Drawing.Point(6, 47);
+            this.tbRevCurrent.Name = "tbRevCurrent";
+            this.tbRevCurrent.Size = new System.Drawing.Size(61, 20);
+            this.tbRevCurrent.TabIndex = 9;
+            this.tbRevCurrent.Tag = PowerController.ConverterMode.ReverseCC;
+            // 
+            // tbRevVoltage
+            // 
+            this.tbRevVoltage.DecimalNumbers = 2;
+            this.tbRevVoltage.ForeColor = System.Drawing.Color.Black;
+            this.tbRevVoltage.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
+            this.tbRevVoltage.HasNegatives = true;
+            this.tbRevVoltage.Location = new System.Drawing.Point(6, 18);
+            this.tbRevVoltage.Name = "tbRevVoltage";
+            this.tbRevVoltage.Size = new System.Drawing.Size(61, 20);
+            this.tbRevVoltage.TabIndex = 8;
+            this.tbRevVoltage.Tag = PowerController.ConverterMode.ReverseCV;
             // 
             // tbInputVoltage
             // 
@@ -376,15 +424,14 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Logging";
             // 
-            // btnLogStart
+            // lblLogFile
             // 
-            this.btnLogStart.Location = new System.Drawing.Point(6, 19);
-            this.btnLogStart.Name = "btnLogStart";
-            this.btnLogStart.Size = new System.Drawing.Size(75, 33);
-            this.btnLogStart.TabIndex = 19;
-            this.btnLogStart.Text = "Start";
-            this.btnLogStart.UseVisualStyleBackColor = true;
-            this.btnLogStart.Click += new System.EventHandler(this.btnLogStart_Click);
+            this.lblLogFile.AutoSize = true;
+            this.lblLogFile.Location = new System.Drawing.Point(6, 55);
+            this.lblLogFile.Name = "lblLogFile";
+            this.lblLogFile.Size = new System.Drawing.Size(0, 13);
+            this.lblLogFile.TabIndex = 21;
+            this.lblLogFile.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lblLogFile_LinkClicked);
             // 
             // btnLogStop
             // 
@@ -396,65 +443,19 @@
             this.btnLogStop.UseVisualStyleBackColor = true;
             this.btnLogStop.Click += new System.EventHandler(this.btnLogStop_Click);
             // 
-            // lblLogFile
+            // btnLogStart
             // 
-            this.lblLogFile.AutoSize = true;
-            this.lblLogFile.Location = new System.Drawing.Point(6, 55);
-            this.lblLogFile.Name = "lblLogFile";
-            this.lblLogFile.Size = new System.Drawing.Size(0, 13);
-            this.lblLogFile.TabIndex = 21;
-            this.lblLogFile.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lblLogFile_LinkClicked);
-            // 
-            // tbRevCurrent
-            // 
-            this.tbRevCurrent.DecimalNumbers = 2;
-            this.tbRevCurrent.ForeColor = System.Drawing.Color.Black;
-            this.tbRevCurrent.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
-            this.tbRevCurrent.HasNegatives = true;
-            this.tbRevCurrent.Location = new System.Drawing.Point(6, 47);
-            this.tbRevCurrent.Name = "tbRevCurrent";
-            this.tbRevCurrent.Size = new System.Drawing.Size(61, 20);
-            this.tbRevCurrent.TabIndex = 9;
-            this.tbRevCurrent.Tag = PowerController.FrmMain.ControllerMode.ReverseCC;
-            // 
-            // tbRevVoltage
-            // 
-            this.tbRevVoltage.DecimalNumbers = 2;
-            this.tbRevVoltage.ForeColor = System.Drawing.Color.Black;
-            this.tbRevVoltage.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
-            this.tbRevVoltage.HasNegatives = true;
-            this.tbRevVoltage.Location = new System.Drawing.Point(6, 18);
-            this.tbRevVoltage.Name = "tbRevVoltage";
-            this.tbRevVoltage.Size = new System.Drawing.Size(61, 20);
-            this.tbRevVoltage.TabIndex = 8;
-            this.tbRevVoltage.Tag = PowerController.FrmMain.ControllerMode.ReverseCV;
-            // 
-            // tbFwdCurrent
-            // 
-            this.tbFwdCurrent.DecimalNumbers = 2;
-            this.tbFwdCurrent.ForeColor = System.Drawing.Color.Black;
-            this.tbFwdCurrent.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
-            this.tbFwdCurrent.HasNegatives = true;
-            this.tbFwdCurrent.Location = new System.Drawing.Point(6, 47);
-            this.tbFwdCurrent.Name = "tbFwdCurrent";
-            this.tbFwdCurrent.Size = new System.Drawing.Size(61, 20);
-            this.tbFwdCurrent.TabIndex = 9;
-            this.tbFwdCurrent.Tag = PowerController.FrmMain.ControllerMode.ForwardCC;
-            // 
-            // tbFwdVoltage
-            // 
-            this.tbFwdVoltage.DecimalNumbers = 2;
-            this.tbFwdVoltage.ForeColor = System.Drawing.Color.Black;
-            this.tbFwdVoltage.Format = "^(\\-?)(\\d*)(\\.?)(\\d?)(\\d?)$";
-            this.tbFwdVoltage.HasNegatives = true;
-            this.tbFwdVoltage.Location = new System.Drawing.Point(6, 18);
-            this.tbFwdVoltage.Name = "tbFwdVoltage";
-            this.tbFwdVoltage.Size = new System.Drawing.Size(61, 20);
-            this.tbFwdVoltage.TabIndex = 8;
-            this.tbFwdVoltage.Tag = PowerController.FrmMain.ControllerMode.ForwardCV;
+            this.btnLogStart.Location = new System.Drawing.Point(6, 19);
+            this.btnLogStart.Name = "btnLogStart";
+            this.btnLogStart.Size = new System.Drawing.Size(75, 33);
+            this.btnLogStart.TabIndex = 19;
+            this.btnLogStart.Text = "Start";
+            this.btnLogStart.UseVisualStyleBackColor = true;
+            this.btnLogStart.Click += new System.EventHandler(this.btnLogStart_Click);
             // 
             // groupBox2
             // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox2.Controls.Add(this.lblDriveCycleFile);
             this.groupBox2.Controls.Add(this.btnPause);
             this.groupBox2.Controls.Add(this.btnPlay);
@@ -467,32 +468,13 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Drive Cycle";
             // 
-            // btnOpen
+            // lblDriveCycleFile
             // 
-            this.btnOpen.Location = new System.Drawing.Point(6, 21);
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(53, 31);
-            this.btnOpen.TabIndex = 0;
-            this.btnOpen.Text = "Open";
-            this.btnOpen.UseVisualStyleBackColor = true;
-            // 
-            // btnRestart
-            // 
-            this.btnRestart.Location = new System.Drawing.Point(65, 21);
-            this.btnRestart.Name = "btnRestart";
-            this.btnRestart.Size = new System.Drawing.Size(53, 31);
-            this.btnRestart.TabIndex = 1;
-            this.btnRestart.Text = "Restart";
-            this.btnRestart.UseVisualStyleBackColor = true;
-            // 
-            // btnPlay
-            // 
-            this.btnPlay.Location = new System.Drawing.Point(124, 21);
-            this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(53, 31);
-            this.btnPlay.TabIndex = 2;
-            this.btnPlay.Text = "Play";
-            this.btnPlay.UseVisualStyleBackColor = true;
+            this.lblDriveCycleFile.AutoSize = true;
+            this.lblDriveCycleFile.Location = new System.Drawing.Point(6, 55);
+            this.lblDriveCycleFile.Name = "lblDriveCycleFile";
+            this.lblDriveCycleFile.Size = new System.Drawing.Size(0, 13);
+            this.lblDriveCycleFile.TabIndex = 4;
             // 
             // btnPause
             // 
@@ -503,13 +485,32 @@
             this.btnPause.Text = "Pause";
             this.btnPause.UseVisualStyleBackColor = true;
             // 
-            // lblDriveCycleFile
+            // btnPlay
             // 
-            this.lblDriveCycleFile.AutoSize = true;
-            this.lblDriveCycleFile.Location = new System.Drawing.Point(6, 55);
-            this.lblDriveCycleFile.Name = "lblDriveCycleFile";
-            this.lblDriveCycleFile.Size = new System.Drawing.Size(0, 13);
-            this.lblDriveCycleFile.TabIndex = 4;
+            this.btnPlay.Location = new System.Drawing.Point(124, 21);
+            this.btnPlay.Name = "btnPlay";
+            this.btnPlay.Size = new System.Drawing.Size(53, 31);
+            this.btnPlay.TabIndex = 2;
+            this.btnPlay.Text = "Play";
+            this.btnPlay.UseVisualStyleBackColor = true;
+            // 
+            // btnRestart
+            // 
+            this.btnRestart.Location = new System.Drawing.Point(65, 21);
+            this.btnRestart.Name = "btnRestart";
+            this.btnRestart.Size = new System.Drawing.Size(53, 31);
+            this.btnRestart.TabIndex = 1;
+            this.btnRestart.Text = "Restart";
+            this.btnRestart.UseVisualStyleBackColor = true;
+            // 
+            // btnOpen
+            // 
+            this.btnOpen.Location = new System.Drawing.Point(6, 21);
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(53, 31);
+            this.btnOpen.TabIndex = 0;
+            this.btnOpen.Text = "Open";
+            this.btnOpen.UseVisualStyleBackColor = true;
             // 
             // FrmMain
             // 

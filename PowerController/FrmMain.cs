@@ -14,17 +14,6 @@ namespace PowerController
 {
     public partial class FrmMain : Form
     {
-        /// <summary>
-        /// Operating modes of the controller
-        /// </summary>
-        public enum ControllerMode
-        {
-            Off = 0,
-            ForwardCV = 1,
-            ForwardCC = 2,
-            ReverseCV = 3,
-            ReverseCC = 4
-        }
         const byte PACKET_START = 0x53; // packet header
         const byte PACKET_END = 0x45; // packet terminator
         const byte FLOAT_SIZE = 4; // bytes in a float
@@ -65,7 +54,7 @@ namespace PowerController
         /// <summary>
         /// Currently active controller mode
         /// </summary>
-        public ControllerMode Mode
+        public ConverterMode Mode
         {
             get;
             set;
@@ -97,7 +86,7 @@ namespace PowerController
             InitializeComponent();
 
 
-            this.Mode = ControllerMode.Off;
+            this.Mode = ConverterMode.Off;
             modeSelectors = new CheckBox[] { btnFwdCC, btnFwdCV, btnRevCC, btnRevCV };
             modeValues = new NumericTextBox[] { tbFwdCurrent, tbFwdVoltage, tbRevVoltage, tbRevCurrent };
 
@@ -259,7 +248,7 @@ namespace PowerController
                 float value = 0;
                 foreach (var tb in modeValues)
                 {
-                    if ((ControllerMode)tb.Tag == this.Mode)
+                    if ((ConverterMode)tb.Tag == this.Mode)
                     {
                         value = tb.getFloatValue();
                     }
@@ -288,7 +277,7 @@ namespace PowerController
         }
 
         // controller mode change event handler
-        private void OnControllerModeChange(ControllerMode newMode)
+        private void OnControllerModeChange(ConverterMode newMode)
         {
             lblStatus.Text = "Mode: " + newMode.ToString();
             this.Mode = newMode;
@@ -302,7 +291,7 @@ namespace PowerController
             }
             foreach (CheckBox cb in modeSelectors)
             {
-                if((ControllerMode)cb.Tag != newMode)
+                if((ConverterMode)cb.Tag != newMode)
                 {
                     cb.Checked = false;
                 }
@@ -312,11 +301,11 @@ namespace PowerController
         private void modeBtn_CheckedChanged(object sender, EventArgs e)
         {
             CheckBox btn = (CheckBox)sender;
-            ControllerMode newMode = (ControllerMode)btn.Tag;
+            ConverterMode newMode = (ConverterMode)btn.Tag;
             gbForward.Focus();
             if(this.Mode == newMode && btn.Checked == false) // an already checked mode was clicked, turn off converter
             {
-                OnControllerModeChange(ControllerMode.Off);
+                OnControllerModeChange(ConverterMode.Off);
             }
             else if (btn.Checked) // a new state was clicked
             {
